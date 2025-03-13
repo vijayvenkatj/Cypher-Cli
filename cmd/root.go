@@ -9,28 +9,21 @@ import (
 )
 
 func viperEnvVariable(key string) string {
-    // Get user's home directory
-    homeDir, err := os.UserHomeDir()
-    if err != nil {
-        fmt.Println("Error getting home directory:", err)
-        return ""
-    }
-    configPath := filepath.Join(homeDir, ".cypher-cli", ".env")
+	viper.SetConfigFile(filepath.Join(os.Getenv("HOME"), ".cypher-cli", ".env"))
+	err := viper.ReadInConfig()
 
-    viper.SetConfigFile(configPath)
-    err = viper.ReadInConfig()
+	if err != nil {
+		fmt.Println("Error while reading config file:", err)
+	}
 
-    if err != nil {
-        fmt.Println("Error while reading config file:", err)
-    }
+	value, ok := viper.Get(key).(string)
+	if !ok {
+		fmt.Println("Invalid type assertion")
+	}
 
-    value, ok := viper.Get(key).(string)
-    if !ok {
-        fmt.Println("Invalid type assertion for key:", key)
-    }
-
-    return value
+	return value
 }
+
 
 var rootCmd = &cobra.Command{
     Use:   "Cypher",
