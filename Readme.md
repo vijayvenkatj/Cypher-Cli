@@ -73,7 +73,7 @@ Since `cypher` relies on Node.js packages and Go binaries being in the **same di
 
    ```bash
    #!/bin/bash
-   cd /home/vijay/Desktop/Cypher-Cli || exit
+   cd <PATH_TO_CYPHER_CLI> || exit
    ./cypher "$@"
    ```
 
