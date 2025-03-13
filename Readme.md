@@ -19,13 +19,19 @@ cd Cypher-Cli || exit
 # Install dependencies
 npm install crypto-js
 
-# Set up environment variable
-echo 'BACKEND_URL="https://cypher-backend-harshiyers-projects.vercel.app"' > .env
+# Create the hidden config directory
+CONFIG_DIR="$HOME/.cypher-cli"
+mkdir -p "$CONFIG_DIR"
+
+# Set up environment variable in ~/.cypher-cli/.env
+echo 'BACKEND_URL="https://cypher-backend-harshiyers-projects.vercel.app"' > "$CONFIG_DIR/.env"
 
 # Build the binary
 go build -o cypher
 
-echo "Cypher CLI setup complete. Run ./cypher to start."
+echo "Cypher CLI setup complete."
+echo "Make sure to add the binary to your PATH or run ./cypher from this directory."
+
 ```
 
 Alternatively, you can manually perform the installation steps:
