@@ -27,8 +27,8 @@ func viperEnvVariable(key string) string {
 
 var rootCmd = &cobra.Command{
     Use:   "Cypher",
-    Short: "Cypher is a CLI tool for performing basic operations",
-    Long:  "Cypher is a CLI tool for performing basic operations - Normal Greeting etc.",
+    Short: "Cypher - Password Manager. ",
+    Long:  "Cypher is an Open Source all on client cloud Password Manager. ",
 }
 
 var usernameFlag string
