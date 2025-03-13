@@ -65,6 +65,30 @@ After building the binary, run the following command:
 ./cypher
 ```
 
+### Running `cypher` from Anywhere
+
+Since `cypher` relies on Node.js packages and Go binaries being in the **same directory**, you must run it from its installation folder. Instead of moving files, you can create a **wrapper script** that ensures `cypher` always runs from the correct directory.
+
+1. **Create a new script** (e.g., `cypher.sh`) in `/usr/local/bin/` or `$HOME/.local/bin/`:
+
+   ```bash
+   #!/bin/bash
+   cd /home/vijay/Desktop/Cypher-Cli || exit
+   ./cypher "$@"
+   ```
+
+2. **Make the script executable**:
+
+   ```bash
+   chmod +x /usr/local/bin/cypher  # or $HOME/.local/bin/cypher
+   ```
+
+3. **Now, you can run `cypher` from anywhere**:
+
+   ```bash
+   cypher show
+   ```
+
 ### Available Commands
 
 - `add`         : Add a password to the vault.
