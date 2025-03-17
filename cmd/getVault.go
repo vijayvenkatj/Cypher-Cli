@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
-	"path/filepath"
 )
 
 type VaultResponce struct {
@@ -37,31 +35,10 @@ func GetVault() (InputJSON, error) {
 	backend_url := viperEnvVariable("BACKEND_URL")
 
 	// Get the user's home directory
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		fmt.Println("Error getting home directory:", err)
-		return InputJSON{}, err
-	}
-	configDir := filepath.Join(homeDir, ".cypher-cli")
-
-	// Define new config file paths
-	tokenPath := filepath.Join(configDir, "token.txt")
-	masterPasswordPath := filepath.Join(configDir, "master_password.txt")
-
-	tokenBytes, err := os.ReadFile(tokenPath)
-	if err != nil {
-		fmt.Println("Please Login to continue.")
-		return InputJSON{}, err
-	}
-
-	masterBytes, err := os.ReadFile(masterPasswordPath)
-	if err != nil {
-		fmt.Println("Please Login to continue.")
-		return InputJSON{}, err
-	}
+	masterPassword,token := Read()
 
 	payload, err := json.Marshal(map[string]string{
-		"token": string(tokenBytes),
+		"token": token,
 	})
 	if err != nil {
 		fmt.Println("Error marshalling JSON:", err)
@@ -83,7 +60,7 @@ func GetVault() (InputJSON, error) {
 	}
 
 	var decryptedDataMap DecryptOutput
-	decryptedDataMap, err = DecryptAES(vaultData.AesString, string(masterBytes), vaultData.Salt)
+	decryptedDataMap, err = DecryptAES(vaultData.AesString, masterPassword, vaultData.Salt)
 	if err != nil {
 		if err.Error() == "Decryption failed." {
 			fmt.Println("Error: Decryption failed.")

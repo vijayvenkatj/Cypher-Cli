@@ -5,9 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
-	"path/filepath"
-
 	"github.com/spf13/cobra"
 )
 
@@ -18,33 +15,14 @@ var Add = &cobra.Command{
 	Short: "Add a password to the vault.",
 	Run: func(cmd *cobra.Command, args []string) {
 		backend_url := viperEnvVariable("BACKEND_URL")
-		encyptionPassword, _ := cmd.Flags().GetString("encryption-password")
 
-		// Get the user's home directory
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			fmt.Println("Error getting home directory:", err)
-			return
-		}
-		configDir := filepath.Join(homeDir, ".cypher-cli")
+		encryptionPassword := PromptForPass("Enter the Encryption password")
+		username := PromptWithUI("Enter the Application username")
+		password := PromptWithUI("Enter the Application password")
+		URL := PromptWithUI("Enter the Application URL or Name")
+		masterPassword,token := Read()
 
-		// Define new config file paths
-		masterPath := filepath.Join(configDir, "master_password.txt")
-		tokenPath := filepath.Join(configDir, "token.txt")
-
-		// Read master password
-		masterBytes, err := os.ReadFile(masterPath)
-		if err != nil {
-			fmt.Println("Please Login to continue.")
-			return
-		}
-		masterPassword := string(masterBytes)
-
-		username, _ := cmd.Flags().GetString("username")
-		password, _ := cmd.Flags().GetString("password")
-		URL, _ := cmd.Flags().GetString("URL")
-
-		if username == "" || URL == "" || encyptionPassword == "" || masterPassword == "" {
+		if username == "" || URL == "" || encryptionPassword == "" || masterPassword == "" {
 			fmt.Println("Error: Missing required fields. (EncryptionPassword / MasterPassword)")
 			return
 		}
@@ -53,16 +31,9 @@ var Add = &cobra.Command{
 			fmt.Println("Password not mentioned: Using", password)
 		}
 
-		// Read token file
-		tokenBytes, err := os.ReadFile(tokenPath)
-		if err != nil {
-			fmt.Println("Error reading token file:", err)
-			return
-		}
-
 		verificationPayload := map[string]interface{}{
-			"encryption_password": createHash(encyptionPassword),
-			"token":               string(tokenBytes),
+			"encryption_password": createHash(encryptionPassword),
+			"token":               token,
 		}
 		verificationPayloadJSON, err := json.Marshal(verificationPayload)
 		if err != nil {
@@ -92,7 +63,7 @@ var Add = &cobra.Command{
 
 		encryptedAESPassword, err := convertToAES(map[string]interface{}{
 			"inputJSON": password,
-		}, encyptionPassword)
+		}, encryptionPassword)
 		if err != nil {
 			fmt.Println("Error encrypting password:", err)
 			return
@@ -130,7 +101,7 @@ var Add = &cobra.Command{
 			"aesString": encryptedVault["aesString"],
 			"salt":      encryptedVault["salt"],
 			"username":  username,
-			"token":     string(tokenBytes),
+			"token":     token,
 		}
 
 		payloadBytes, err := json.Marshal(payload)
@@ -153,12 +124,4 @@ var Add = &cobra.Command{
 
 		fmt.Println("Password added successfully.")
 	},
-}
-
-func init() {
-	Add.Flags().StringP("URL", "U", "", "URL to send the password to.")
-	Add.MarkFlagRequired("URL")
-	Add.Flags().StringP("username", "u", "", "Specify the username for the website.")
-	Add.MarkFlagRequired("username")
-	Add.Flags().StringP("password", "p", "", "Specify the password for the website. (Ignore if you need a random password assigned)")
 }

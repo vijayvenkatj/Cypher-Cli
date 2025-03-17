@@ -31,10 +31,10 @@ var Register = &cobra.Command{
 	Use:   "register",
 	Short: "Register using Master credentials.",
 	Run: func(cmd *cobra.Command, args []string) {
-		username, _ := cmd.Flags().GetString("username")
-		email, _ := cmd.Flags().GetString("email")
-		master_password, _ := cmd.Flags().GetString("master-password")
-		encryption_password, _ := cmd.Flags().GetString("encryption-password")
+		username := PromptWithUI("Enter the Username")
+		email := PromptWithUI("Enter the Email")
+		master_password := PromptWithUI("Enter the Master Password -> DO NOT FORGET")
+		encryption_password := PromptWithUI("Enter the Encryption Password")
 		backend_url := viperEnvVariable("BACKEND_URL")
 
 		if(username == "" || email == "" || master_password == "" || encryption_password == ""){

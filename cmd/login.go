@@ -20,8 +20,8 @@ var Login = &cobra.Command{
 	Use:   "login",
 	Short: "Login using Master credentials.",
 	Run: func(cmd *cobra.Command, args []string) {
-		username, _ := cmd.Flags().GetString("username")
-		master_password, _ := cmd.Flags().GetString("master-password")
+		username := PromptWithUI("Enter the Username")
+		master_password := PromptForPass("Enter the Master Password")
 		if username == "" || master_password == "" {
 			fmt.Println("Error: Missing required fields.")
 			return
@@ -84,9 +84,6 @@ var Login = &cobra.Command{
 			fmt.Println("Error:", err)
 			return
 		}
-
-		fmt.Println(LoginResponce.Message)
-
 		// Write token and master password to files
 		err = os.WriteFile(tokenPath, []byte(LoginResponce.Token), 0600)
 		if err != nil {
@@ -99,5 +96,7 @@ var Login = &cobra.Command{
 			fmt.Println("Error writing to master password file:", err)
 			return
 		}
+		
+		fmt.Println(LoginResponce.Message)
 	},
 }

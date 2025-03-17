@@ -48,7 +48,7 @@ Alternatively, you can manually perform the installation steps:
    ```
 
 3. Set up the environment variable:
-   Create a `.env` file in the root directory and add the following:
+   Create a `.env` file in the Config directory and add the following:
    ```sh
    BACKEND_URL="https://cypher-backend-harshiyers-projects.vercel.app"
    ```

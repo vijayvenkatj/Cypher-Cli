@@ -5,63 +5,31 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
-	"path/filepath"
 	"github.com/spf13/cobra"
 )
-
-var deletepasswordFlag string
 
 var Delete = &cobra.Command{
 	Use:   "delete",
 	Short: "Delete a password from the vault.",
 	Run: func(cmd *cobra.Command, args []string) {
-		// Get the user's home directory
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			fmt.Println("Error getting home directory:", err)
-			return
-		}
-		configDir := filepath.Join(homeDir, ".cypher-cli")
-
-		// Define new config file paths
-		usernamePath := filepath.Join(configDir, "username.txt")
-		masterPasswordPath := filepath.Join(configDir, "master_password.txt")
-		tokenPath := filepath.Join(configDir, "token.txt")
-
-		usernameBytes, err := os.ReadFile(usernamePath)
-		if err != nil {
-			fmt.Println("Error reading username:", err)
-			return
-		}
+		
+		master_password,token := Read()
 		backend_url := viperEnvVariable("BACKEND_URL")
-		username := string(usernameBytes)
+		username := GetUsername()
 
-		masterBytes, err := os.ReadFile(masterPasswordPath)
-		if err != nil {
-			fmt.Println("Please login to continue.")
-			return
-		}
-		master_password := string(masterBytes)
+		encryptionPassword := PromptForPass("Enter your Encryption Password")
 
-		encyptionPassword, _ := cmd.Flags().GetString("encryption-password")
-		name, _ := cmd.Flags().GetString("name")
+		name := PromptWithMultipleLabels()
 
-		if username == "" || master_password == "" || name == "" || encyptionPassword == "" {
+		if username == "" || master_password == "" || name == "" || encryptionPassword == "" {
 			fmt.Println("Error: Missing required fields (master_password / encryption_password / name).")
-			return
-		}
-
-		tokenBytes, err := os.ReadFile(tokenPath)
-		if err != nil {
-			fmt.Println("Error reading token file:", err)
 			return
 		}
 
 		// Verify encryption password
 		verificationPayload := map[string]interface{}{
-			"encryption_password": createHash(encyptionPassword),
-			"token":               string(tokenBytes),
+			"encryption_password": createHash(encryptionPassword),
+			"token":               token,
 		}
 		verificationPayloadJSON, err := json.Marshal(verificationPayload)
 		if err != nil {
@@ -127,7 +95,7 @@ var Delete = &cobra.Command{
 			"aesString": encryptedVault["aesString"],
 			"salt":      encryptedVault["salt"],
 			"username":  username,
-			"token":     string(tokenBytes),
+			"token":     token,
 		}
 
 		payloadBytes, err := json.Marshal(payload)
@@ -150,8 +118,4 @@ var Delete = &cobra.Command{
 
 		fmt.Println("Password entry deleted successfully.")
 	},
-}
-
-func init() {
-	Delete.Flags().StringVarP(&deletepasswordFlag, "name", "n", "", "URL/Name for the password to be deleted")
 }

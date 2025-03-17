@@ -31,11 +31,6 @@ var rootCmd = &cobra.Command{
     Long:  "Cypher is an Open Source all on client cloud Password Manager. ",
 }
 
-var usernameFlag string
-var masterPasswordFlag string
-var encryptionPasswordFlag string
-var emailFlag string
-
 func Execute() {
     rootCmd.AddCommand(Register)
     rootCmd.AddCommand(Login)
@@ -48,11 +43,4 @@ func Execute() {
         fmt.Fprintf(os.Stderr, "Oops. An error occurred while executing Cypher: '%s'\n", err)
         os.Exit(1)
     }
-}
-
-func init() {
-    rootCmd.PersistentFlags().StringVarP(&usernameFlag, "username", "u", "", "Specify the Username to use for Master login.")
-    rootCmd.PersistentFlags().StringVarP(&masterPasswordFlag, "master-password", "m", "", "Specify the Master Password to use for Master login. (DO NOT FORGET THIS PASSWORD)")
-    rootCmd.PersistentFlags().StringVarP(&encryptionPasswordFlag, "encryption-password", "e", "", "Specify the Encryption Password.")
-    rootCmd.PersistentFlags().StringVarP(&emailFlag, "email", "l", "", "Specify the Email.")
 }
